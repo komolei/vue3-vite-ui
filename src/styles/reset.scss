@@ -1,0 +1,76 @@
+@charset "utf-8";
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+  font-family: PingFangSC-Regular, HYQiHei-FES, "Helvetica Neue", Helvetica,
+    STHeiTi, Arial, sans-serif;
+  line-height: 1.42857143;
+  font-weight: 400;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+a {
+  text-decoration: none;
+  -webkit-touch-callout: none;
+}
+
+input {
+  outline: none;
+  border: none;
+  -webkit-appearance: none;
+}
+
+iframe {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 0;
+  z-index: -9999;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100vh;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+ul,
+li,
+ol {
+  list-style: none;
+}
+
+i {
+  font-style: normal;
+}
+
+// 兼容部分浏览器图片不会显示
+img {
+  content: normal !important;
+}
+
+// input自动填充样式重置 99999s 基本上就是一个无限长的时间, 通过延长增加自动填充背景色的方式, 是用户感受不到样式的变化
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-transition-delay: 99999s;
+  -webkit-transition: color 99999s ease-out, background-color 99999s ease-out;
+}
+
+// 去除加减按钮
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+input {
+  -moz-appearance: textfield;
+}

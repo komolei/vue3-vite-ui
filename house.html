@@ -1,0 +1,816 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--[31,682,12] published at 2021-05-28 15:35:11 from #130 by 2602-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="mask-icon" sizes="any" href="http://www.sina.com.cn/favicon.svg" color="red">
+<meta http-equiv="Content-type" content="text/html; charset=gb2312" />
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<title>房贷_理财计算器_财经_新浪网</title>
+<meta name="keywords" content="理财计算器,金融计算器,理财工具,活期储蓄计算器,通知存款计算器,定活两便计算器,整存整取计算器,整存零取计算器,存本取息计算器,等额本金计算器,等额本息计算器,提前还贷计算器,利率调整计算器,外汇储蓄计算器,外汇兑换计算器,股票投资损益计算器,股票保本计算器,期货交易计算器,股指期货计算器,基金申赎计算器,基金申购计算器,债券收益率计算器,零息债券计算器,固定收益债券计算器,个人所得税计算器,住房公积金计算器,养老保险计算器,车贷计算器,汽车贷款计算器,汽车金融计算器,房贷计算器,按揭计算器,期权计算器,二叉树计算器,权证计算器,股票beta计算器,股票阿尔法计算器,股票alpha计算器,基金alpha计算器,基金阿尔法计算器" />
+<meta name="description" content="新浪财经理财计算器提供一系列金融理财计算工具，为投资理财提供精确化的计算参考。包括银行储蓄，股票、基金、外汇、期货、债券等投资品种，置业、购车消费，公积金、养老保险等年金，以及个税等相关的计算。" />
+<link type="text/css" rel="stylesheet" rev="stylesheet" href="http://i0.sinaimg.cn/cj/calc/css/main20110711.css" />
+<link type="text/css" rel="stylesheet" rev="stylesheet" href="http://finance.sina.com.cn/calc/css/redmond/jquery-ui-1.8.custom.css" />
+<script type="text/javascript">
+//全局变量，对所有页面均有效 
+//注意：所有数额均不能带引号！！
+
+//通知存款年利率
+var notifyYearDate1 = 0.55;  //提前一天通知
+var notifyYearDate7 = 1.10;  //提前七天通知
+
+//利息税
+var interestRate = 0; 
+
+//活期储蓄利率
+var currentRate = 0.35;
+
+//整存整取利率
+var lumpRate90 = 1.10;  //三个月
+var lumpRate180 = 1.30;  //半年
+var lumpRate360 = 1.50;  //一年
+var lumpRate720 = 2.10;  //两年
+var lumpRate1080 = 2.75;  //三年
+var lumpRate1800 = 2.75;  //五年
+
+//整存零取
+var smallRate360 = 1.35;  //一年
+var smallRate1080 = 1.55;  //三年
+var smallRate1800 = 1.55;  //五年
+
+//零存整取
+var slRate360 = 1.35;  //一年
+var slRate1080 = 1.55;  //三年
+var slRate1800 = 1.55;  //五年
+
+//存本取息
+var idRate360 = 1.35;  //一年
+var idRate1080 = 1.55;  //三年
+var idRate1800 = 1.55;  //五年
+
+//个人贷款利率
+var loadRate = 4.35; 
+
+//基金买卖
+var fundRate1 = 1.5;     //申购
+var fundRate2 = 0.5;     //赎回
+var fundRate3 = 1.2;     //认购
+
+//个人所得税
+var personUnexpectedRate = 0.2; //意外所得税 
+var personPaperRate = 0.3; //稿酬所得 
+var personTaxBase = 5000; //个税起征额 
+
+//外汇储蓄利息税
+var fxRateFee = 0;
+//外汇储蓄汇率
+var fxRateArray = [
+//活期  七天通知  一个月  三个月  六个月  一年  二年 
+[0.1000,0.1000,0.2500,0.4000,0.7500,1.0000,1.2000] , //*美元 
+[0.1250,0.1750,0.2500,0.3500,0.6000,0.7500,0.7500], //英镑  
+[0.1000,0.3750,0.4500,0.6500,0.9550,1.1000,1.1500], //*欧元  
+[0.0001,0.0005,0.0100,0.0100,0.0100,0.0100,0.0100], //日元 
+[0.0200,0.0200,0.1000,0.2500,0.5000,0.7000,0.7500], //港币 
+[0.0100,0.0500,0.0500,0.0500,0.3000,0.4000,0.4000], //加拿大元 
+[0.0001,0.0005,0.0100,0.0100,0.0100,0.0100,0.0100], //瑞士法郎 
+[0.2375,0.2625,1.2400,1.3875,1.5075,1.5750,1.5750], //澳大利亚元 
+[0.0001,0.0005,0.0100,0.0100,0.0100,0.0100,0.0100] //新加坡元 
+];
+
+//房贷利率
+//1，2，3....为ID 再有利率变动增加时，需要递增
+//title用户下拉框显示
+//rate依次为 商贷 3-5年  商贷 5-30年  公积金 1-5年  公积金 5-30年
+// isdefault: true, 为下拉框中的默认显示项
+
+//商贷利率 3-5年  5-30年
+var houseLoanBuzzRate = {
+	1	: {
+		title	: "08年11月27日利率下限",
+		rate	: [ 0.0416, 0.0428]
+	},
+	2	: {
+		title	: "08年11月27日利率上限",
+		rate	: [ 0.0653, 0.0673]
+	},
+	3	: {
+		title	: "08年11月27日基准利率",
+		rate	: [ 0.0594, 0.0673]
+	},	
+	4	: {
+		title	: "08年11月27日第二套房",
+		rate	: [ 0.0653, 0.0673]
+	},
+	5	: {
+		title	: "08年12月23日利率下限(7折)",
+		rate	: [ 0.0403, 0.0416]
+	},
+	6	: {
+
+		title	: "08年12月23日利率下限(8折)",
+		rate	: [ 0.0461, 0.0475]
+	},	
+	7	: {
+		title	: "08年12月23日利率下限(85折)",
+		rate	: [ 0.0490, 0.0505]
+	},
+	8	: {
+		title	: "08年12月23日利率上限(1.1倍)",
+		rate	: [ 0.0634, 0.0653]
+	},
+	9	: {
+		title	: "08年12月23日基准利率",
+		rate	: [ 0.0576, 0.0594]
+	},
+	10	: {
+		title	: "08年12月23日第二套房(1.1倍)",
+		rate	: [ 0.0634, 0.0653]
+
+        },
+	11	: {
+
+                title	: "10年10月20日基准利率",
+		rate	: [ 0.0596, 0.0614]
+
+        },
+	12	: {
+
+                title	: "10年12月26日基准利率",
+		rate	: [ 0.0614, 0.0640]
+
+        },
+	13	: {
+
+                title	: "11年02月09日基准利率",
+		rate	: [ 0.0645, 0.066]
+
+        },
+	14	: {
+
+                title	: "11年04月06日基准利率",
+		rate	: [ 0.0665, 0.068]
+
+        },
+	15	: {
+
+                title	: "11年07月07日基准利率",
+		rate	: [ 0.0690, 0.0705]
+
+        },
+	16	: {
+
+                title	: "12年06月08日基准利率",
+		rate	: [ 0.0650, 0.0680]
+
+        },
+	17	: {
+
+                title	: "12年07月06日基准利率",
+		rate	: [ 0.0640, 0.0655]
+
+	},		
+        18	: {
+		isdefault: true,
+                title	: "14年11月22日基准利率",
+		rate	: [ 0.06, 0.0615]
+
+        },
+
+        19	: {
+		isdefault: true,
+                title	: "15年3月1日基准利率",
+		rate	: [ 0.0575, 0.0590]
+
+        },
+
+        20	: {
+		isdefault: true,
+                title	: "15年5月11日基准利率",
+		rate	: [ 0.0550, 0.0565]
+
+        },
+
+        21	: {
+		isdefault: true,
+                title	: "15年6月28日基准利率",
+		rate	: [ 0.0525, 0.0540]
+
+        },   
+
+        22	: {
+		isdefault: true,
+                title	: "15年8月26日基准利率",
+		rate	: [ 0.0500, 0.0515]
+
+        }, 
+
+        23	: {
+		isdefault: true,
+                title	: "15年10月24日基准利率",
+		rate	: [ 0.0475, 0.0490]
+
+        }, 
+
+};
+//公积金贷款利率 1-5年  5-30年
+var houseLoanCounRate = {
+	1	: {
+		title	: "08年11月27日后",
+		rate	: [ 0.0351, 0.0405]
+	},
+	2	: {
+
+		title	: "08年12月23日后",
+		rate	: [ 0.0333, 0.0387]
+	},
+
+	3	: {
+
+		title	: "10年10月20日后",
+		rate	: [ 0.0350, 0.0405]
+	},
+
+	4	: {
+
+		title	: "10年12月26日后",
+		rate	: [ 0.0375, 0.0430]
+
+	},
+
+	5	: {
+
+		title	: "11年02月09日后",
+		rate	: [ 0.04, 0.045]
+
+	},
+
+	6	: {
+
+		title	: "11年04月06日后",
+		rate	: [ 0.042, 0.047]
+
+	},
+
+	7	: {
+
+		title	: "11年07月07日后",
+		rate	: [ 0.0445, 0.049]
+
+	},
+
+	8	: {
+
+		title	: "12年06月08日后",
+		rate	: [ 0.042, 0.047]
+
+	},
+
+	9	: {
+
+		title	: "12年07月06日后",
+		rate	: [ 0.040, 0.045]
+	},		
+	10	: {
+		isdefault: true,
+		title	: "14年11月22日后",
+		rate	: [ 0.0375, 0.0425]
+  },											11: {
+		isdefault: true,
+		title	: "15年3月1日后",
+		rate	: [ 0.0350, 0.0400]
+        },	
+        12: {
+		isdefault: true,
+		title	: "15年5月11日后",
+		rate	: [ 0.0325, 0.0375]
+        },
+        13: {
+		isdefault: true,
+		title	: "15年6月28日后",
+		rate	: [ 0.0300, 0.0350]
+        }, 
+        14: {
+		isdefault: true,
+		title	: "15年8月26日后",
+		rate	: [ 0.0275, 0.0325]
+        },  
+
+};
+//首页右侧房贷利率
+var houseLoanRateRight = [ 
+["15.10.24后商贷基准", 4.75, 4.90],
+["15.10.24后公积金贷", 2.75, 3.25],
+["15.08.26后商贷基准", 5.00, 5.15],
+["15.08.26后公积金贷", 2.75, 3.25],
+["15.06.28后商贷基准", 5.25, 5.40],
+["15.06.28后公积金贷", 3.00, 3.50],
+["15.05.11后商贷基准", 5.50, 5.65],
+["15.05.11后公积金贷", 3.25, 3.75],
+["15.03.01后商贷基准", 5.75, 5.90],
+["15.03.01后公积金贷", 3.50, 4.00],
+["14.11.22后商贷基准", 6.00, 6.15],
+["14.11.22后公积金贷", 3.75, 4.25],
+["12.07.06后商贷基准", 6.40, 6.55],
+["12.07.06后公积金贷", 4.00, 4.50],
+["12.06.08后商贷基准", 6.65, 6.80],
+["12.06.08后公积金贷", 4.20, 4.70],
+["11.07.07后商贷基准", 6.90, 7.05],
+["11.07.07后公积金贷", 4.45, 4.90],
+["11.04.06后商贷基准", 6.65, 6.80],
+["11.04.06后公积金贷", 4.20, 4.70],
+["11.02.09后商贷基准", 6.45, 6.60],
+["11.02.09后公积金贷", 4.00, 4.50],
+["10.12.26后商贷基准", 6.22, 6.40],
+["10.12.26后公积金贷", 3.75, 4.30],
+["10.10.20后商贷基准", 5.96, 6.14],
+["10.10.20后公积金贷", 3.50, 4.05],
+["08.12.23后商贷基准", 5.76, 5.94],
+["08.12.23后商贷8折", 4.61, 4.75],
+["08.12.23后商贷7折", 4.03, 4.16],
+["08.12.23后公积金贷", 3.33, 3.87],
+["08.11.27后公积金贷", 3.51, 4.05]
+
+ ];
+
+</script>	
+		<script type="text/javascript" charset="utf-8" src="http://finance.sina.com.cn/calc/js/lib/makeone.js" ></script>
+		<script type="text/javascript" src="http://finance.sina.com.cn/calc/js/lib/global.js" ></script>
+		<script type="text/javascript" charset="utf-8" src="http://finance.sina.com.cn/calc/js/house_loan20110517.js" ></script>
+
+</head>
+<body><!-- body code begin -->
+  <!-- zcpart1 start -->
+  <div class="zcpart1 clearfix">
+     <div class="zcleft clearfix">
+         <script type="text/javascript">
+			//<![CDATA[
+			function slideTab(slideId) {
+
+				var curSlide = document.getElementById(slideId);
+				var curTab = curSlide.getElementsByTagName("dt");
+				var count = curTab.length;
+				for (var i=0;i<count ;i++ )
+				{
+				   curTab[i].onclick = function() {
+				      var dl = this.parentNode;
+					  dl.className = dl.className == "zc_show" ? "" : "zc_show";
+					  this.className = this.className == "zc_down" ? "zc_up" : "zc_down" ;
+				   }
+				}
+
+				return false;
+			}
+
+			slideTab("slide_1")
+
+			function left( dl, dd ){
+				var dl = jQuery("#slide_1 dl[param='" + dl + "']").addClass( "zc_show" );
+				dl.find("DT").addClass("zc_down");
+				dl.find("DD p a[param='" + dd + "']").addClass("selected");
+			}
+
+			//]]>
+		 </script>
+		 <div class="contant">
+		 	<div id="center">
+    <h2>房贷</h2>
+    <div id="detailct">
+        <a id="detail" href="javascript:void(0)">[详细]</a>
+        <div id="desc">
+            本计算器提供等额本息、等额本金，及住房公积金贷款特有的自由还款方式的计算参考。在贷款期限方面，支持非整年的期数。贷款利率除提供常用备选利率外，还支持自定义输入。计算结果包含月供、公积金月最低还款额、本息总额等。 
+        </div>
+    </div>
+    <div id="types">
+        <div id="tabs-1">
+            <form class="verify" id="houseLoan">
+                <div class="input">
+                    <table cellpadding="0" cellspacing="0">
+                        <tbody>
+                            <tr>
+                                <td class="frontface">
+                                    贷款类型
+                                </td>
+                                <td>
+                                    <div id="loadType">
+                                        <input value="1" type="radio" id="radio3" name="radio" checked="checked" />
+                                        <label for="radio3">
+                                            商业贷款
+                                        </label>
+                                        <input value="2" type="radio" id="radio5" name="radio" />
+                                        <label for="radio5">
+                                            公积金
+                                        </label>
+                                        <input value="3" type="radio" id="radio6" name="radio" />
+                                        <label for="radio6">
+                                            组合型
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="buzzTr">
+                                <td class="frontface">
+                                    商业贷款金额
+                                </td>
+                                <td>
+                                    <input class="uinumber require" id="loadBuzzAmt" value=""><span class="unit">万元</span>
+                                </td>
+                            </tr>
+                            <tr class="counTr">
+                                <td class="frontface">
+                                    公积金贷款金额
+                                </td>
+                                <td>
+                                    <input class="uinumber require" id="loadCounAmt" value="0"><span class="unit">万元</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="frontface">
+                                    贷款期限
+                                </td>
+                                <td>
+                                    <input class="uinumber require" value="20" id="years"><span class="unit">年</span>
+                                    <select id="month">
+                                        <option selected="selected" value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                    </select>
+                                    <span class="unit">月 (共<span id="term">240</span>期)</span>
+                                </td>
+                            </tr>
+                            <tr class="buzzTr">
+                                <td class="frontface">
+                                    商业贷款利率
+                                </td>
+                                <td>
+                                    <select id="buzzRateSel">
+                                        <option value="-1">手动输入</option>
+                                    </select>
+                                    <input style="width:50px;" class="uinumber require" value="0.00" id="buzzRate"><span class="unit">%</span>
+                                </td>
+                            </tr>
+                            <tr class="counTr">
+                                <td class="frontface">
+                                    公积金贷款利率
+                                </td>
+                                <td>
+                                    <select id="counRateSel">
+                                        <option value="-1">手动输入</option>
+                                    </select>
+                                    <input style="width:50px;" class="uinumber require" value="0.00" id="counRate"><span class="unit">%</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="frontface">
+                                    还款方式
+                                </td>
+                                <td>
+                                	<div id="payType">
+                                        <input value="1" type="radio" id="radioPay1" name="radioPay" checked="checked" />
+                                        <label for="radioPay1">
+                                            等额本息
+                                        </label>
+                                        <input value="2" type="radio" id="radioPay2" name="radioPay" />
+                                        <label for="radioPay2">
+                                            等额本金
+                                        </label>
+										<input value="3" type="radio" id="radioPay6" name="radioPay" />
+                                        <label id="radioPay6Label" for="radioPay6">
+                                            自由还款
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <center>
+                        <button hidefocus="true" type="submit">
+                            计算
+                        </button>
+                        <button hidefocus="true" id="resetbtn" type="reset">
+                            重置
+                        </button>
+                    </center>
+                </div>
+                <div class="output">
+                    <div class="zch2">
+                        <h4>计算结果</h4>
+                    </div>
+                    <style>
+                        #buzzRateSel, #counRateSel {
+                            width: 200px;
+                        }
+
+                        #types table tr td#rateTd {
+                            padding-left: 190px;
+                            padding-top: 0;
+                            width: 348px;
+                            font-size: 12px;
+                        }
+
+                        .counTr {
+                            display: none;
+                        }
+
+                        .list {
+                            height: 25px;
+                            overflow: auto;
+                            background: #FFFFFF;
+                            vertical-align: top;
+                            width: 538px;
+                            -moz-user-select: all;
+                            overflow-x: hidden;
+                        }
+
+                        .listhead {
+                            border-bottom: 1px solid #CCCCCC;
+                        }
+
+                        .listhead div {
+                            font-size: 12px;
+                            color: #0152A4;
+                        }
+
+                        .ct div {
+                            width: 103px;
+                            display: inline-block;
+                            float: left;
+                            text-align: center;
+                            overflow: hidden;
+                        }
+
+                        .ct dd, .ct dt {
+                            display: block;
+                            width: 100%;
+                            height: 18px;
+                            line-height: 18px;
+                            overflow: hidden;
+                        }
+
+                        .ct dd {
+                            border-bottom: 1px dashed #CCCCCC;
+                        }
+                    </style>
+                        <div id="detailsWrap" class="ct">
+                            <dl style="padding-right:18px;">
+                                <dt class="listhead">
+                                    <div>
+                                        期次
+                                    </div>
+                                    <div>
+                                        偿还本息(元)
+                                    </div>
+                                    <div>
+                                        偿还利息(元)
+                                    </div>
+                                    <div>
+                                        偿还本金(元)
+                                    </div>
+                                    <div>
+                                        剩余本金(元)
+                                    </div>
+                                    <div class="clear">
+                                    </div>
+                                </dt>
+                            </dl>
+                            <dl class="list">
+                            </dl>
+                        </div>
+						<div id="freeWrap" style="display:none;" class="ct">
+                            <dl style="padding-right:18px;">
+                                <dt class="listhead">
+                                    <div>
+                                        期次
+                                    </div>
+                                    <div>
+                                        最低偿还本息(元)
+                                    </div>
+                                    <div>
+                                        最低偿还利息(元)
+                                    </div>
+                                    <div>
+                                        最低偿还本金(元)
+                                    </div>
+                                    <div>
+                                        剩余本金(元)
+                                    </div>
+                                    <div class="clear">
+                                    </div>
+                                </dt>
+                            </dl>
+                            <dl class="list">
+                            </dl>
+                        </div>
+
+                        <table id="detailsTable" width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
+                            <tbody>
+                                <tr style="display:none;" id="BuzzIntAmtTr">
+                                    <td class="frontface">
+                                        商贷支付利息
+                                    </td>
+                                    <td>
+                                        <input id="BuzzIntAmt" readonly="readonly" class="txtd"><span class="unit">元</span>
+                                    </td>
+                                </tr>
+                                <tr style="display:none;" id="CounIntAmtTr">
+                                    <td class="frontface">
+                                        公积金支付利息
+                                    </td>
+                                    <td>
+                                        <input id="CounIntAmt" readonly="readonly" class="txtd"><span class="unit">元</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="frontface">
+                                        累计支付利息
+                                    </td>
+                                    <td>
+                                        <input id="intAmt" readonly="readonly" class="txtd"><span class="unit">元</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="frontface">
+                                        累计还款总额
+                                    </td>
+                                    <td>
+                                        <input id="fullAmt" readonly="readonly" class="txtd"><span class="unit">元</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+						<table width="100%" id="freeTable" style="display:none;" cellspacing="0" cellpadding="0" border="0" align="center">
+                            <tbody>
+                                <tr>
+                                    <td class="frontface">
+                                        月最低还款额
+                                    </td>
+                                    <td>
+                                        <input id="lessPay" readonly="readonly" class="txtd"><span class="unit">元</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="frontface">
+                                        最后一期偿还本金
+                                    </td>
+                                    <td>
+                                        <input id="lastAmount" readonly="readonly" class="txtd"><span class="unit">元</span>
+                                    </td>
+                                </tr>
+								<tr>
+                                    <td class="frontface">
+                                        最后一期偿还利息
+                                    </td>
+                                    <td>
+                                        <input id="lastInt" readonly="readonly" class="txtd"><span class="unit">元</span>
+                                    </td>
+                                </tr>
+								<tr>
+                                    <td class="frontface">
+                                        累积支付利息
+                                    </td>
+                                    <td>
+                                        <input id="totalInt" readonly="readonly" class="txtd"><span class="unit">元</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">
+        left("house", "loan");
+    </script>
+
+		 </div>
+
+     </div>
+	 <div class="zcright clearfix">
+	    <div class="zcblk01 zcblks2">
+			<div class="zctit1 clearfix">
+			   <h2>存款利率</h2>
+			   <p class="more"></p>
+			</div>
+			<div class="zccont clearfix">
+				 <table width="100%" cellspacing="0" cellpadding="0">
+				 	<thead>
+				 		<tr>
+				 			<td>利率项目</td>
+							<td style="text-align:right;">年利率</td>
+				 		</tr>
+				 	</thead>
+					<tbody>
+						<tr>
+							<td class="L">活期储蓄</td>
+							<td class='R'><script>document.write(window.currentRate )</script>%</td>
+						</tr>
+						<tr>
+							<td class="L">三个月定期存款</td>
+							<td class='R'><script>document.write(window.lumpRate90 )</script>%</td>
+						</tr>
+						<tr>
+							<td class="L">半年定期存款</td>
+							<td class='R'><script>document.write(window.lumpRate180 )</script>%</td>
+						</tr>
+						<tr>
+							<td class="L">一年定期存款</td>
+							<td class='R'><script>document.write(window.lumpRate360 )</script>%</td>
+						</tr>
+						<tr>
+							<td class="L">二年定期存款</td>
+							<td class='R'><script>document.write(window.lumpRate720 )</script>%</td>
+						</tr>
+                                                <tr>
+							<td class="L">三年定期存款</td>
+							<td class='R'><script>document.write(window.lumpRate1080 )</script>%</td>
+						</tr>
+						<tr>
+							<td class="L">五年定期存款</td>
+							<td class='R'><script>document.write(window.lumpRate1800 )</script>%</td>
+						</tr>
+						<tr>
+							<td class="L">一天通知存款</td>
+							<td class='R'><script>document.write(window.notifyYearDate1 )</script>%</td>
+						</tr>
+						<tr>
+							<td class="L">七天通知存款</td>
+							<td class='R'><script>document.write(window.notifyYearDate7 )</script>%</td>
+						</tr>						
+					</tbody>
+				 </table>
+			</div>
+			<div class="zcbot">
+
+		    </div>	
+	    </div>
+		<div class="zcblk02 zcblks2">
+			<div class="zctit1 clearfix">
+			   <h2>房贷利率</h2>
+			   <p class="more"></p>
+			</div>
+			<div class="zccont clearfix">
+				 <table id="loadTable" width="100%" cellspacing="0" cellpadding="0">
+				 	<thead>
+				 		<tr>
+				 			<td>调整时间</td>
+							<td style="text-align:right;">1-5年</td>
+							<td style="text-align:right;">5-30年</td>
+				 		</tr>
+				 	</thead>
+					<tbody>
+					</tbody>
+				 </table>
+			</div>
+			<div class="zcbot">
+
+		    </div>	
+	    </div>
+		<div class="zcblk03 zcblks2">
+			<div class="zctit1 clearfix">
+			   <h2><a href="http://finance.sina.com.cn/forex/rmbexchange.html" target="_blank">人民币汇率</a></h2>
+			   <p class="more"></p>
+			</div>
+			<div class="zccont clearfix">
+				 <table id="fxTable" width="100%" cellspacing="0" cellpadding="0">
+				 	<thead>
+				 		<tr>
+				 			<td>货币名称</td>
+							<td style="text-align:right;">现汇买入价</td>
+							<td style="text-align:right;">现钞买入价</td>
+				 		</tr>
+				 	</thead>
+					<tbody>
+					</tbody>
+				 </table>
+			</div>
+			<div class="zcbot">
+
+		    </div>	
+	    </div>
+
+     </div>
+  </div>
+  <!-- zcpart1 end -->
+  <!-- main end -->
+
+<div id="dialog-modal" title="提示">
+	<p></p>
+</div>
+</div>
+<!-- body code end -->
+
+</body>
+</html>
